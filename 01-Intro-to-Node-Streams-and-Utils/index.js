@@ -7,14 +7,22 @@ const server = http.createServer(async (req, res) => {
 
         res.writeHead(200, { 'Content-Type': 'text/css' });
         res.write(cssContent);
-        
+
         return res.end();
     }
 
-    const homePage = await fs.readFile('./views/home/index.html', 'utf-8');
+    let htmlContent = '';
+    res.writeHead(200, { 'content-type': 'text/html' });
 
-    res.writeHead(200, { 'Content-Type': 'text/html'});
-    res.write(homePage);
+    if (req.url === '/') {
+        htmlContent = await fs.readFile('./views/home/index.html', 'utf-8');
+    } else if (req.url === '/cats/add-breed') {
+        htmlContent = await fs.readFile('./views/addBreed.html', 'utf-8');
+    } else if (req.url === '/cats/add-cat') {
+        htmlContent = await fs.readFile('./views/addCat.html', 'utf-8');
+    }
+
+    res.write(htmlContent);
 
     res.end();
 });
