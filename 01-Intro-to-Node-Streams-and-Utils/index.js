@@ -1,5 +1,6 @@
 import http from 'http';
 import fs from 'fs/promises';
+import cats from './cats.js';
 
 const server = http.createServer(async (req, res) => {
     if (req.url === '/styles/site.css') {
@@ -15,7 +16,7 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, { 'content-type': 'text/html' });
 
     if (req.url === '/') {
-        htmlContent = await fs.readFile('./views/home/index.html', 'utf-8');
+        htmlContent = await renderHomePage();
     } else if (req.url === '/cats/add-breed') {
         htmlContent = await fs.readFile('./views/addBreed.html', 'utf-8');
     } else if (req.url === '/cats/add-cat') {
@@ -30,3 +31,23 @@ const server = http.createServer(async (req, res) => {
 server.listen(3000, () => {
     console.log('Server is listening on http://localhost:3000...');
 });
+
+async function renderHomePage() {
+    let htmlContent = await fs.readFile('./views/home/index.html', 'utf-8');
+
+    const catTemplate = (cat) => `
+        <li>
+            <img src="${cat.imageUrl}" alt="${cat.name}">
+            <h3>${cat.name}</h3>
+            <p><span>Breed: </span>${cat.breed}</p>
+            <p><span>Description: </span>${cat.description}</p>
+            <ul class="buttons">
+                <li class="btn edit"><a href="">Change Info</a></li>
+                <li class="btn delete"><a href="">New Home</a></li>
+            </ul>
+        </li>`;
+
+    htmlContent = htmlContent.replace('{{cats}}', cats.map(cat => catTemplate(cat)).join('\n'));
+
+    return htmlContent;
+}
