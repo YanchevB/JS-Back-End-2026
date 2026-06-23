@@ -1,7 +1,7 @@
 import http from 'http';
 import fs from 'fs/promises';
 import cats from './cats.js';
-import { addBreed, readBreeds } from './breedsService.js';
+import { addBreed, getBreedById, readBreeds } from './breedsService.js';
 
 const server = http.createServer(async (req, res) => {
 
@@ -19,12 +19,13 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'POST' && req.url === '/cats/add-cat') {
         const bodyFormData = await readBodyFormData(req);
+        const breedId = bodyFormData.get('breed');
 
         const newCat = {
             name: bodyFormData.get('name'),
             description: bodyFormData.get('description'),
             imageUrl: bodyFormData.get('imageUrl'),
-            breed: bodyFormData.get('breed')
+            breed: getBreedById(breedId)
         }
 
         cats.push(newCat);
