@@ -38,9 +38,9 @@ const server = http.createServer(async (req, res) => {
     if (req.url === '/') {
         htmlContent = await renderHomePage();
     } else if (req.url === '/cats/add-breed') {
-        htmlContent = await renderAddCatPage();
+        htmlContent = await renderAddBreedPage();
     } else if (req.url === '/cats/add-cat') {
-        htmlContent = await fs.readFile('./views/addCat.html', 'utf-8');
+        htmlContent = await renderAddCatPage();
     }
 
     res.write(htmlContent);
@@ -59,6 +59,12 @@ async function renderAddCatPage() {
     const result = htmlContent.replace('{{breedOptions}}', breedOptions);
 
     return result;
+}
+
+async function renderAddBreedPage() {
+    const htmlContent = await fs.readFile('./views/addBreed.html', 'utf-8');
+
+    return htmlContent;
 }
 
 async function renderHomePage() {
