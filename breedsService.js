@@ -17,3 +17,7 @@ export function addBreed(breedName) {
 export function getBreedById(id) {
    return breeds.find(breed => breed.id === id).name;
 }
+
+export function renderBreedOptions(selectedBreed) {
+    return readBreeds().map(breed => `<option value="${breed.id}"${breed.name === selectedBreed ? ' selected ': ''}>${breed.name}</option>`).join('\n');
+}

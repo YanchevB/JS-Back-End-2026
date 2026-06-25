@@ -2,7 +2,7 @@ import http from 'http';
 import fs from 'fs/promises';
 import cats from './cats.js';
 import { v4 } from 'uuid';
-import { addBreed, getBreedById, readBreeds } from './breedsService.js';
+import { addBreed, getBreedById, readBreeds, renderBreedOptions } from './breedsService.js';
 import { getCatById, getCatId, editCat } from './catService.js';
 
 const server = http.createServer(async (req, res) => {
@@ -74,7 +74,7 @@ const server = http.createServer(async (req, res) => {
 async function renderAddCatPage() {
     const htmlContent = await fs.readFile('./views/addCat.html', 'utf-8');
     
-    const breedOptions = readBreeds().map(breed => `<option value="${breed.id}">${breed.name}</option>`).join('\n');
+    const breedOptions = renderBreedOptions();
     const result = htmlContent.replace('{{breedOptions}}', breedOptions);
     
     return result;
@@ -112,7 +112,8 @@ async function renderEditCatPage(catId) {
     const htmlContent = await fs.readFile('./views/editCat.html', 'utf-8');
     const result = htmlContent.replace('{{name}}', cat.name)
         .replace('{{description}}', cat.description)
-        .replace('{{imageUrl}}', cat.imageUrl);
+        .replace('{{imageUrl}}', cat.imageUrl)
+        .replace('{{breedOptions}}', renderBreedOptions(cat.breed));
     
     return result;
 }

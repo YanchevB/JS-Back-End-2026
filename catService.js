@@ -1,3 +1,4 @@
+import { getBreedById } from './breedsService.js';
 import cats from './cats.js';
 
 export function getCatById(catId) {
@@ -14,5 +15,6 @@ export function editCat(catId, catData) {
     cats[catIndex] = {
         id: catId,
         ...catData,
+        breed: getBreedById(catData.breed)
     };
 }
