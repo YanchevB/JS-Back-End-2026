@@ -2,6 +2,7 @@ import http from 'http';
 import fs from 'fs/promises';
 import cats from './cats.js';
 import { addBreed, getBreedById, readBreeds } from './breedsService.js';
+import { getCatById } from './catService.js';
 
 const server = http.createServer(async (req, res) => {
 
@@ -52,6 +53,9 @@ const server = http.createServer(async (req, res) => {
         htmlContent = await renderAddBreedPage();
     } else if (req.url === '/cats/add-cat') {
         htmlContent = await renderAddCatPage();
+    } else if (req.url.startsWith('/cats/edit-cat')) {
+        const catId = req.url.split('/').pop();
+        htmlContent = await renderEditCatPage(catId);
     }
 
     res.write(htmlContent);
@@ -85,7 +89,7 @@ async function renderHomePage() {
     <p><span>Breed: </span>${cat.breed}</p>
     <p><span>Description: </span>${cat.description}</p>
     <ul class="buttons">
-    <li class="btn edit"><a href="">Change Info</a></li>
+    <li class="btn edit"><a href="/cats/edit-cat/${cat.id}">Change Info</a></li>
     <li class="btn delete"><a href="">New Home</a></li>
     </ul>
     </li>`;
@@ -93,6 +97,17 @@ async function renderHomePage() {
     htmlContent = htmlContent.replace('{{cats}}', cats.map(cat => catTemplate(cat)).join('\n'));
     
     return htmlContent;
+}
+
+async function renderEditCatPage(catId) {
+    const cat = getCatById(catId);
+
+    const htmlContent = await fs.readFile('./views/editCat.html', 'utf-8');
+    const result = htmlContent.replace('{{name}}', cat.name)
+        .replace('{{description}}', cat.description)
+        .replace('{{imageUrl}}', cat.imageUrl);
+    
+    return result;
 }
 
 async function readBodyFormData(req) {
