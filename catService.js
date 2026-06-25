@@ -1,6 +1,15 @@
 import { getBreedById } from './breedsService.js';
 import cats from './cats.js';
 
+export function readCats(filter = {}) {
+    let result = cats;
+
+    if (filter.name) {
+        result = result.filter(cat => cat.name.toLowerCase().includes(filter.name.toLowerCase()));
+    }
+    return result;
+}
+
 export function getCatById(catId) {
     return cats.find(cat => cat.id === catId);
 }

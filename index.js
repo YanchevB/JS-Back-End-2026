@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import cats from './cats.js';
 import { v4 } from 'uuid';
 import { addBreed, getBreedById, readBreeds, renderBreedOptions } from './breedsService.js';
-import { getCatById, getCatId, editCat, deleteCat } from './catService.js';
+import { getCatById, getCatId, editCat, deleteCat, readCats } from './catService.js';
 
 const server = http.createServer(async (req, res) => {
     //POST Requests
@@ -63,6 +63,11 @@ const server = http.createServer(async (req, res) => {
 
     if (req.url === '/') {
         htmlContent = await renderHomePage();
+    } else if (req.url.startsWith('/search')) {
+        const urlParams = new URLSearchParams(req.url.split('?')[1]);
+        const name = urlParams.get('name');
+
+        htmlContent = await renderHomePage({ name });
     } else if (req.url === '/cats/add-breed') {
         htmlContent = await renderAddBreedPage();
     } else if (req.url === '/cats/add-cat') {
@@ -114,7 +119,7 @@ async function renderAddBreedPage() {
     return htmlContent;
 }
 
-async function renderHomePage() {
+async function renderHomePage(filter) {
     let htmlContent = await fs.readFile('./views/home/index.html', 'utf-8');
     
     const catTemplate = (cat) => `
@@ -128,8 +133,10 @@ async function renderHomePage() {
     <li class="btn delete"><a href="/cats/new-home/${cat.id}">New Home</a></li>
     </ul>
     </li>`;
+
+    let cat = readCats(filter);
     
-    htmlContent = htmlContent.replace('{{cats}}', cats.map(cat => catTemplate(cat)).join('\n'));
+    htmlContent = htmlContent.replace('{{cats}}', cat.map(c => catTemplate(c)).join('\n'));
     
     return htmlContent;
 }
